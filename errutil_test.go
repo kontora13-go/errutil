@@ -39,16 +39,16 @@ func TestErrorInGoroutine(t *testing.T) {
 	g, _ := errgroup.WithContext(context.Background())
 	for i := 0; i < 100; i++ {
 		g.Go(func() error {
-			err = errutil.WithDevMessagef(err, fmt.Sprintf("err%v", i))
-			log.Print("err.dev := ", err.Error())
+			_ = errutil.WithDevMessagef(err, fmt.Sprintf("err%v", i))
+			//log.Print("err.dev := ", err.Error())
 
 			return nil
 		})
 	}
 	for i := 0; i < 100; i++ {
 		g.Go(func() error {
-			err = errutil.WithMessagef(err, fmt.Sprintf("err%v", i))
-			log.Print("err.msg := ", err.Error())
+			_ = errutil.WithMessagef(err, fmt.Sprintf("err%v", i))
+			//log.Print("err.msg := ", err.Error())
 
 			return nil
 		})
@@ -56,5 +56,29 @@ func TestErrorInGoroutine(t *testing.T) {
 
 	if err = g.Wait(); err != nil {
 		t.Error(err)
+	}
+}
+
+func BenchmarkErrorDevMessage(b *testing.B) {
+	err := errutil.New("test user error", "one")
+
+	for i := 0; i < b.N; i++ {
+		err = errutil.WithDevMessagef(err, "error")
+	}
+}
+
+func BenchmarkErrorMessage(b *testing.B) {
+	err := errutil.New("test user error", "one")
+
+	for i := 0; i < b.N; i++ {
+		err = errutil.WithMessagef(err, "error")
+	}
+}
+
+func BenchmarkErrorStack(b *testing.B) {
+	err := errutil.New("test user error", "one")
+
+	for i := 0; i < b.N; i++ {
+		err = errutil.WithStack(err)
 	}
 }
