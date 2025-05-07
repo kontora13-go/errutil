@@ -2,7 +2,6 @@ package errutil_test
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"testing"
 
@@ -39,7 +38,8 @@ func TestErrorInGoroutine(t *testing.T) {
 	g, _ := errgroup.WithContext(context.Background())
 	for i := 0; i < 100; i++ {
 		g.Go(func() error {
-			_ = errutil.WithDevMessagef(err, fmt.Sprintf("err%v", i))
+
+			err = errutil.WithDevMessagef(err, "err%v", i)
 			//log.Print("err.dev := ", err.Error())
 
 			return nil
@@ -47,7 +47,7 @@ func TestErrorInGoroutine(t *testing.T) {
 	}
 	for i := 0; i < 100; i++ {
 		g.Go(func() error {
-			_ = errutil.WithMessagef(err, fmt.Sprintf("err%v", i))
+			err = errutil.WithMessagef(err, "err%v", i)
 			//log.Print("err.msg := ", err.Error())
 
 			return nil
